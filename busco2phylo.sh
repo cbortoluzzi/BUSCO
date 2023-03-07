@@ -20,34 +20,35 @@ fi
 
 
 
-FILE=$1
-DIRECTORY=$2
+file=$1
+directory=$2
 
 
 mkdir -p busco
 
 
 # Count number of genomes
-num_genomes=`cat $FILE | wc -l`
+num_genomes=`cat $file | wc -l`
 echo "We will build a phylogenetic tree on " $num_genomes "genomes"
 
 
-# Obtain the complete list of complete single copy BUSCO genes shared by all species included in the input file
-cat $FILE | while read assembly species_name
+# Obtain the complete list of single copy BUSCO genes shared by all species included in the input file
+cat $file | while read assembly species_name
 do
-	if [ -e $DIRECTORY/$species_name/vertebrata_odb10_metaeuk/run_vertebrata_odb10/full_table.tsv ]
+	if [ -e $directory/$species_name/vertebrata_odb10_metaeuk/run_vertebrata_odb10/full_table.tsv ]
 	then
-		printf '%s\t%s\n' "$DIRECTORY/$species_name/vertebrata_odb10_metaeuk" "$species_name" >> path_to_busco.txt
+		printf '%s\t%s\n' "$directory/$species_name/vertebrata_odb10_metaeuk" "$species_name" >> path_to_busco.txt
 	else
-		printf '%s\t%s\n' "$DIRECTORY/$species_name/$assembly/vertebrata_odb10_metaeuk" "$species_name" >> path_to_busco.txt
+		printf '%s\t%s\n' "$directory/$species_name/$assembly/vertebrata_odb10_metaeuk" "$species_name" >> path_to_busco.txt
 	fi
 done
+
 # Obtain unique single copy BUSCO genes
 cat path_to_busco.txt | while read path species_name;do cat $path/run_vertebrata_odb10/full_table.tsv | grep -v '^#' | awk '$2=="Complete" {print $1}' >> busco/complete_busco_ids.txt;done
 sort busco/complete_busco_ids.txt | uniq -c | awk '$1=="'$num_genomes'"{print $2}' > busco/final_busco_ids.txt && rm busco/complete_busco_ids.txt
 
 
-# Obtain a MAFFT alignment for each complete single copy BUSCO gene
+# Obtain a MAFFT alignment for each single copy BUSCO gene
 mkdir -p busco/mafft && mkdir -p busco/trimAl
 
 cat busco/final_busco_ids.txt | while read busco_id
