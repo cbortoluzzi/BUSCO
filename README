@@ -1,0 +1,9 @@
+Set of scripts to run BUSCO and build a phylogenetic tree from single-copy BUSCO genes.
+
+Requirements:
+- BUSCO v5.1.2
+- mafft v7.490
+- trimAl v1.4.rev22 build
+- RAxML v8.2.12
+- python 3.8.10
+
